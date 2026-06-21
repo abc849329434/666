@@ -1,0 +1,63 @@
+import requests
+from urllib.parse import urlparse, parse_qs
+
+# 1. 这里的配置对应你图片中的 app_configs 内容
+APP_CONFIGS = {
+    "追片喵": {
+        "host": "https://svip.2video.cc",
+        "headers": {
+            "userId": "xxxx",
+            "verCode": "56",
+            "verName": "1.2.6",
+            "deviceId": "xxxxxxx",
+            "package": "com.ds.wlss",
+            "signature": "70:DF:B1:2A:AE:C3:E3:73:6E:23:0F:67:B9:3B:C5:63:2D:EA:2A:2C:9E:9D:52:82:1D:3F:3C:3C:B9:10:9E:EE",
+            "User-Agent": "okhttp/3.12.0"  # 通常这类应用需要模拟手机端的 UA
+        }
+    }
+}
+
+def parse_proxy_url(proxy_str):
+    """
+    解析 proxy:// 格式的自定义链接并执行请求
+    """
+    try:
+        # 将自定义协议替换为 http 方便 urllib 解析参数
+        fake_url = proxy_str.replace("proxy://", "http://")
+        parsed = urlparse(fake_url)
+        # 提取参数字典 (例如: {'source': '追片喵', 'url': '...' })
+        params = {k: v[0] for k, v in parse_qs(parsed.query).items()}
+        
+        source = params.get("source")
+        target_path = params.get("url", "")
+
+        if source not in APP_CONFIGS:
+            return f"错误：未找到资源配置 [{source}]"
+
+        config = APP_CONFIGS[source]
+        # 拼接完整请求地址
+        full_url = f"{config['host']}/{target_path.lstrip('/')}"
+        
+        print(f"正在请求目标: {full_url}")
+
+        # 发起网络请求，带上图片中的签名和 ID
+        response = requests.get(
+            full_url, 
+            headers=config["headers"], 
+            timeout=10
+        )
+        
+        # 返回结果 (通常是 JSON 或加密后的字符串)
+        return response.text
+
+    except Exception as e:
+        return f"脚本执行异常: {str(e)}"
+
+# --- 测试运行 ---
+if __name__ == "__main__":
+    # 模拟你给出的输入链接
+    input_url = "proxy://do=py&siteKey=proxy_noxjx&type=nox_jx&source=追片喵&url=/api/get_data"
+    
+    result = parse_proxy_url(input_url)
+    print("返回内容如下：")
+    print(result)
