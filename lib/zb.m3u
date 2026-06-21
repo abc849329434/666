@@ -1,0 +1,263 @@
+#EXTM3U x-tvg-url=http://epg.51zmt.top:8000/cc.xml,http://epg.51zmt.top:8000/difang.xml
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV1" tvg-id="CCTV1" tvg-name="CCTV1" group-title="央卫频道",CCTV1
+http://223.109.75.19:8000/057754/index.m3u8
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV2" tvg-id="CCTV2" tvg-name="CCTV2" group-title="央卫频道",CCTV2
+http://223.109.75.19:8000/061465/index.m3u8
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV3" tvg-id="CCTV3" tvg-name="CCTV3" group-title="央卫频道",CCTV3
+http://223.109.75.19:8000/830965/index.m3u8
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV4" tvg-id="CCTV4" tvg-name="CCTV4" group-title="央卫频道",CCTV4
+http://223.109.75.19:8000/143097/index.m3u8
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV5" tvg-id="CCTV5" tvg-name="CCTV5" group-title="央卫频道",CCTV5
+http://223.109.75.19:8000/930480/index.m3u8
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV5" tvg-id="CCTV5" tvg-name="CCTV5" group-title="央卫频道",CCTV5+
+http://223.109.75.19:8000/470540/index.m3u8
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV6" tvg-id="CCTV6" tvg-name="CCTV6" group-title="央卫频道",CCTV6
+http://223.109.75.19:8000/520737/index.m3u8
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV7" tvg-id="CCTV7" tvg-name="CCTV7" group-title="央卫频道",CCTV7
+http://223.109.75.19:8000/649185/index.m3u8
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV8" tvg-id="CCTV8" tvg-name="CCTV8" group-title="央卫频道",CCTV8
+http://223.109.75.19:8000/235836/index.m3u8
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV9" tvg-id="CCTV9" tvg-name="CCTV9" group-title="央卫频道",CCTV9
+http://223.109.75.19:8000/827648/index.m3u8
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV10" tvg-id="CCTV10" tvg-name="CCTV10" group-title="央卫频道",CCTV10
+http://223.109.75.19:8000/502378/index.m3u8
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV11" tvg-id="CCTV11" tvg-name="CCTV11" group-title="央卫频道",CCTV11
+http://223.109.75.19:8000/554982/index.m3u8
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV12" tvg-id="CCTV12" tvg-name="CCTV12" group-title="央卫频道",CCTV12
+http://223.109.75.19:8000/422642/index.m3u8
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV13" tvg-id="CCTV13" tvg-name="CCTV13" group-title="央卫频道",CCTV13
+http://223.109.75.19:8000/593087/index.m3u8
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV14" tvg-id="CCTV14" tvg-name="CCTV14" group-title="央卫频道",CCTV14
+http://223.109.75.19:8000/271607/index.m3u8
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV15" tvg-id="CCTV15" tvg-name="CCTV15" group-title="央卫频道",CCTV15
+http://223.109.75.19:8000/399438/index.m3u8
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV16" tvg-id="CCTV16" tvg-name="CCTV16" group-title="央卫频道",CCTV16
+http://223.109.75.19:8000/246232/index.m3u8
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV17" tvg-id="CCTV17" tvg-name="CCTV17" group-title="央卫频道",CCTV17
+http://223.109.75.19:8000/299438/index.m3u8
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV1综合" tvg-id="CCTV1综合" tvg-name="CCTV1综合" group-title="央卫频道",CCTV1综合
+http://43.136.116.27:99/kzb.php?id=cctv1
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV2财经" tvg-id="CCTV2财经" tvg-name="CCTV2财经" group-title="央卫频道",CCTV2财经
+http://43.136.116.27:99/kzb.php?id=cctv2
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV3综艺" tvg-id="CCTV3综艺" tvg-name="CCTV3综艺" group-title="央卫频道",CCTV3综艺
+http://43.136.116.27:99/kzb.php?id=cctv3
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV4中文国际" tvg-id="CCTV4中文国际" tvg-name="CCTV4中文国际" group-title="央卫频道",CCTV4中文国际
+http://43.136.116.27:99/kzb.php?id=cctv4
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV4中文国际" tvg-id="CCTV4中文国际" tvg-name="CCTV4中文国际" group-title="央卫频道",CCTV4中文国际-美洲
+http://43.136.116.27:99/kzb.php?id=cctv4a
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV4中文国际" tvg-id="CCTV4中文国际" tvg-name="CCTV4中文国际" group-title="央卫频道",CCTV4中文国际-欧洲
+http://43.136.116.27:99/kzb.php?id=cctv4o
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV5体育" tvg-id="CCTV5体育" tvg-name="CCTV5体育" group-title="央卫频道",CCTV5体育
+http://43.136.116.27:99/kzb.php?id=cctv5
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV5" tvg-id="CCTV5" tvg-name="CCTV5" group-title="央卫频道",CCTV5+体育赛事
+http://43.136.116.27:99/kzb.php?id=cctv5p
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV6电影" tvg-id="CCTV6电影" tvg-name="CCTV6电影" group-title="央卫频道",CCTV6电影
+http://43.136.116.27:99/kzb.php?id=cctv6
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV7国防军事" tvg-id="CCTV7国防军事" tvg-name="CCTV7国防军事" group-title="央卫频道",CCTV7国防军事
+http://43.136.116.27:99/kzb.php?id=cctv7
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV8电视剧" tvg-id="CCTV8电视剧" tvg-name="CCTV8电视剧" group-title="央卫频道",CCTV8电视剧
+http://43.136.116.27:99/kzb.php?id=cctv8
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV9纪录" tvg-id="CCTV9纪录" tvg-name="CCTV9纪录" group-title="央卫频道",CCTV9纪录
+http://43.136.116.27:99/kzb.php?id=cctv9
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV10科教" tvg-id="CCTV10科教" tvg-name="CCTV10科教" group-title="央卫频道",CCTV10科教
+http://43.136.116.27:99/kzb.php?id=cctv10
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV11戏曲" tvg-id="CCTV11戏曲" tvg-name="CCTV11戏曲" group-title="央卫频道",CCTV11戏曲
+http://43.136.116.27:99/kzb.php?id=cctv11
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV12社会与法" tvg-id="CCTV12社会与法" tvg-name="CCTV12社会与法" group-title="央卫频道",CCTV12社会与法
+http://43.136.116.27:99/kzb.php?id=cctv12
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV13新闻" tvg-id="CCTV13新闻" tvg-name="CCTV13新闻" group-title="央卫频道",CCTV13新闻
+http://43.136.116.27:99/kzb.php?id=cctv13
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV14少儿" tvg-id="CCTV14少儿" tvg-name="CCTV14少儿" group-title="央卫频道",CCTV14少儿
+http://43.136.116.27:99/kzb.php?id=cctv14
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV15音乐" tvg-id="CCTV15音乐" tvg-name="CCTV15音乐" group-title="央卫频道",CCTV15音乐
+http://43.136.116.27:99/kzb.php?id=cctv15
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV17农业农村" tvg-id="CCTV17农业农村" tvg-name="CCTV17农业农村" group-title="央卫频道",CCTV17农业农村
+http://43.136.116.27:99/kzb.php?id=cctv17
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/东方卫视" tvg-id="东方卫视" tvg-name="东方卫视" group-title="央卫频道",东方卫视
+http://43.136.116.27:99/kzb.php?id=dfws
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/陕西卫视" tvg-id="陕西卫视" tvg-name="陕西卫视" group-title="央卫频道",陕西卫视
+http://43.136.116.27:99/kzb.php?id=sxws
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/河南卫视" tvg-id="河南卫视" tvg-name="河南卫视" group-title="央卫频道",河南卫视
+http://43.136.116.27:99/kzb.php?id=hnws
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/江西卫视" tvg-id="江西卫视" tvg-name="江西卫视" group-title="央卫频道",江西卫视
+http://43.136.116.27:99/kzb.php?id=jxws
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/江苏卫视" tvg-id="江苏卫视" tvg-name="江苏卫视" group-title="央卫频道",江苏卫视
+http://43.136.116.27:99/kzb.php?id=jsws
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/浙江卫视" tvg-id="浙江卫视" tvg-name="浙江卫视" group-title="央卫频道",浙江卫视
+http://43.136.116.27:99/kzb.php?id=zjws
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/东南卫视" tvg-id="东南卫视" tvg-name="东南卫视" group-title="央卫频道",东南卫视
+http://43.136.116.27:99/kzb.php?id=dnws
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/广东卫视" tvg-id="广东卫视" tvg-name="广东卫视" group-title="央卫频道",广东卫视
+http://43.136.116.27:99/kzb.php?id=gdws
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV01高码" tvg-id="CCTV01高码" tvg-name="CCTV01高码" group-title="央卫北京",CCTV-01高码
+http://k.061899.xyz/m.php?id=cctv1
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV02高码" tvg-id="CCTV02高码" tvg-name="CCTV02高码" group-title="央卫北京",CCTV-02高码
+http://k.061899.xyz/m.php?id=cctv2
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV04高码" tvg-id="CCTV04高码" tvg-name="CCTV04高码" group-title="央卫北京",CCTV-04高码
+http://k.061899.xyz/m.php?id=cctv4
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV07高码" tvg-id="CCTV07高码" tvg-name="CCTV07高码" group-title="央卫北京",CCTV-07高码
+http://k.061899.xyz/m.php?id=cctv7
+#EXTINF:-1,五星体育高码
+http://k.061899.xyz/m.php?id=wxty
+#EXTINF:-1,咪咕体育高码
+http://k.061899.xyz/m.php?id=mgty
+#EXTINF:-1,动作电影高码
+http://k.061899.xyz/m.php?id=dzdy
+#EXTINF:-1,辽宁卫视高码
+http://k.061899.xyz/m.php?id=lnws
+#EXTINF:-1,河北卫视高码
+http://k.061899.xyz/m.php?id=hbws
+#EXTINF:-1,河南卫视高码
+http://k.061899.xyz/m.php?id=hnws
+#EXTINF:-1,江西卫视高码
+http://k.061899.xyz/m.php?id=jxws
+#EXTINF:-1,贵州卫视高码
+http://k.061899.xyz/m.php?id=gzws
+#EXTINF:-1,湖北卫视高码
+http://k.061899.xyz/m.php?id=hubws
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV01频效" tvg-id="CCTV01频效" tvg-name="CCTV01频效" group-title="央卫频效",CCTV-01频效
+http://t.061899.xyz/tl/tl.php?id=cctv1
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV02频效" tvg-id="CCTV02频效" tvg-name="CCTV02频效" group-title="央卫频效",CCTV-02频效
+http://t.061899.xyz/tl/tl.php?id=cctv2
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV03频效" tvg-id="CCTV03频效" tvg-name="CCTV03频效" group-title="央卫频效",CCTV-03频效
+http://t.061899.xyz/tl/tl.php?id=cctv3
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV04频效" tvg-id="CCTV04频效" tvg-name="CCTV04频效" group-title="央卫频效",CCTV-04频效
+http://t.061899.xyz/tl/tl.php?id=cctv4
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV07频效" tvg-id="CCTV07频效" tvg-name="CCTV07频效" group-title="央卫频效",CCTV-07频效
+http://t.061899.xyz/tl/tl.php?id=cctv7
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV13频效" tvg-id="CCTV13频效" tvg-name="CCTV13频效" group-title="央卫频效",CCTV-13频效
+http://t.061899.xyz/tl/tl.php?id=cctv13
+#EXTINF:-1,北京卫视频效
+http://t.061899.xyz/tl/tl.php?id=bjws
+#EXTINF:-1,东方卫视频效
+http://t.061899.xyz/tl/tl.php?id=dfws
+#EXTINF:-1,浙江卫视频效
+http://t.061899.xyz/tl/tl.php?id=zjws
+#EXTINF:-1,广东卫视频效
+http://t.061899.xyz/tl/tl.php?id=gdws
+#EXTINF:-1,深圳卫视频效
+http://t.061899.xyz/tl/tl.php?id=szws
+#EXTINF:-1,天津卫视频效
+http://t.061899.xyz/tl/tl.php?id=tjws
+#EXTINF:-1,安徽卫视频效
+http://t.061899.xyz/tl/tl.php?id=ahws
+#EXTINF:-1,辽宁卫视频效
+http://t.061899.xyz/tl/tl.php?id=lnws
+#EXTINF:-1,河北卫视频效
+http://t.061899.xyz/tl/tl.php?id=hbws
+#EXTINF:-1,河南卫视频效
+http://t.061899.xyz/tl/tl.php?id=hnws
+#EXTINF:-1,江西卫视频效
+http://t.061899.xyz/tl/tl.php?id=jxws
+#EXTINF:-1,东南卫视频效
+http://t.061899.xyz/tl/tl.php?id=dnws
+#EXTINF:-1,海南卫视频效
+http://t.061899.xyz/tl/tl.php?id=hinws
+#EXTINF:-1,青海卫视频效
+http://t.061899.xyz/tl/tl.php?id=qhws
+#EXTINF:-1,兵团卫视频效
+http://t.061899.xyz/tl/tl.php?id=btws
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV01高码" tvg-id="CCTV01高码" tvg-name="CCTV01高码" group-title="央卫高码",CCTV-01高码
+http://cdn6.bkpcp.top/tl/tuiliu.php?id=cctv1
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV02高码" tvg-id="CCTV02高码" tvg-name="CCTV02高码" group-title="央卫高码",CCTV-02高码
+http://cdn6.bkpcp.top/tl/tuiliu.php?id=cctv2
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV13高码" tvg-id="CCTV13高码" tvg-name="CCTV13高码" group-title="央卫高码",CCTV-13高码
+http://cdn6.bkpcp.top/tl/tuiliu.php?id=cctv13
+#EXTINF:-1 tvg-logo="http://wtv.tools.yigechengzi.pro/prod/api/v1/tvg/logo/CCTV17高码" tvg-id="CCTV17高码" tvg-name="CCTV17高码" group-title="央卫高码",CCTV-17高码
+http://cdn6.bkpcp.top/tl/tuiliu.php?id=cctv17
+#EXTINF:-1,北京卫视高码
+http://cdn6.bkpcp.top/tl/tuiliu.php?id=bjws
+#EXTINF:-1,东方卫视高码
+http://cdn6.bkpcp.top/tl/tuiliu.php?id=dfws
+#EXTINF:-1,辽宁卫视高码
+http://cdn6.bkpcp.top/tl/tuiliu.php?id=lnws
+#EXTINF:-1,河北卫视高码
+http://cdn6.bkpcp.top/tl/tuiliu.php?id=hbws
+#EXTINF:-1,河南卫视高码
+http://cdn6.bkpcp.top/tl/tuiliu.php?id=hnws
+#EXTINF:-1,江西卫视高码
+http://cdn6.bkpcp.top/tl/tuiliu.php?id=jxws
+#EXTINF:-1,深圳卫视频4k
+https://livepull-tcms.sztv.com.cn/live/sz4Kpgm.m3u8
+#EXTINF:-1,广东体育频高
+http://push-rtmp-hs-spe-f5.douyincdn.com/live/guangdong_ty.flv
+#EXTINF:-1,无线新闻频高
+http://erp.giihgtidg.com:8080/live/wxxw01.m3u8
+#EXTINF:-1,无线翡翠频高
+http://push-rtmp-hs-spe-f5.douyincdn.com/live/awei_jade.flv
+#EXTINF:-1,无线翡翠频高
+http://erp.giihgtidg.com:8080/live/jade01.m3u8
+#EXTINF:-1,广东新闻频高
+http://push-rtmp-hs-spe-f5.douyincdn.com/live/guangdong_xw.flv
+#EXTINF:-1,广东民生频高
+http://push-rtmp-hs-spe-f5.douyincdn.com/live/guangdong_ms.flv
+#EXTINF:-1,广东影视频高
+http://push-rtmp-hs-spe-f5.douyincdn.com/live/guangdong_ys.flv
+#EXTINF:-1,民视闽南频标
+http://push-rtmp-hs-spe-f5.douyincdn.com/live/awei_mstw.flv
+#EXTINF:-1,中天亚洲频标
+http://push-rtmp-hs-spe-f5.douyincdn.com/live/awei_ztyz.flv
+#EXTINF:-1,中天综合频高
+http://push-rtmp-hs-spe-f5.douyincdn.com/live/awei_ztzh.flv
+#EXTINF:-1,八大第一频高
+http://push-rtmp-hs-spe-f5.douyincdn.com/live/awei_bddy.flv
+#EXTINF:-1,八大综合频高
+http://push-rtmp-hs-spe-f5.douyincdn.com/live/awei_bdzh.flv
+#EXTINF:-1,无线星河粤标
+http://php.jdshipin.com/PLTV/iptv.php?id=xinghe
+#EXTINF:-1,无线功夫粤标
+http://php.jdshipin.com/PLTV/iptv.php?id=yzwx
+#EXTINF:-1,美亚电影国高
+https://fr-us7.jdiptv.cc/live/xgmydygy.m3u8
+#EXTINF:-1,凤凰电影频标
+http://iot-mqqt.111yao.cn:8080/live/diyp_fhdy.m3u8
+#EXTINF:-1,星空电影频高
+http://iot-mqqt.111yao.cn:8080/live/diyp_starmovies.m3u8
+#EXTINF:-1,星空音乐频标
+http://iot-mqqt.111yao.cn:8080/live/diyp_channelv.m3u8
+#EXTINF:-1,星空卫视频标
+http://iot-mqqt.111yao.cn:8080/live/diyp_xingkong.m3u8
+#EXTINF:-1,星光综合频视
+http://push-rtmp-hs-spe-f5.douyincdn.com/live/zxcvbnm9852.flv
+#EXTINF:-1,美剧解说轮播
+http://lxajh.top/tv/douyu.php?id=9643264
+#EXTINF:-1,经典美剧解说
+http://lxajh.top/tv/douyu.php?id=9123570
+#EXTINF:-1,96笑傲江湖粤
+http://lxajh.top/tv/douyu.php?id=8912325
+#EXTINF:-1,科幻Fans轮播
+http://lxajh.top/tv/douyu.php?id=3508304
+#EXTINF:-1,科幻解说轮播
+http://lxajh.top/tv/douyu.php?id=9338839
+#EXTINF:-1,娱乐扒叔轮播
+http://lxajh.top/tv/douyu.php?id=9624581
+#EXTINF:-1,粤语版电影三
+http://lxajh.top/tv/douyu.php?id=1226741
+#EXTINF:-1,星空卫视频道
+http://122.224.58.42:85/tsfile/live/1024_1.m3u8?key=txiptv&playlive=1&authid=0
+#EXTINF:-1,重温经典频道
+http://120.76.248.139/live/bfgd/4200000635.m3u8
+#EXTINF:-1,邵氏影院频视
+http://lxajh.top/tv/douyu.php?id=4246519
+#EXTINF:-1,Plus综合频临
+http://t.061899.xyz/tl/168.php?id=2j
+#EXTINF:-1,now星影频临
+http://j.s.bkpcp.top/js/nowxyt
+#EXTINF:-1,凤凰中文频临
+http://j.s.bkpcp.top/js/fhzw
+#EXTINF:-1,凤凰资讯频临
+http://j.s.bkpcp.top/js/fhzx
+#EXTINF:-1,凤凰香港频临
+http://j.s.bkpcp.top/js/fhxg
+#EXTINF:-1,无线新闻频临
+http://t.061899.xyz/tl/168.php?id=wxxwt
+#EXTINF:-1,无线翡翠频临
+http://t.061899.xyz/tl/168.php?id=fct
+#EXTINF:-1,无线明珠频临
+http://t.061899.xyz/tl/168.php?id=zzt
+#EXTINF:-1,无线千禧频临
+http://t.061899.xyz/tl/168.php?id=tvbqxjd
+#EXTINF:-1,天映频道频临
+http://t.061899.xyz/tl/168.php?id=typd
+#EXTINF:-1,天映经典频临
+http://t.061899.xyz/tl/168.php?id=tyjd
