@@ -1,0 +1,56 @@
+def init(self, extend=""):
+    try:
+        ext_dict = {}
+        if extend.strip().startswith('{') and extend.strip().endswith('}'):
+            try:
+                ext_dict = json.loads(extend.strip())
+            except:
+                ext_dict = {'host': extend.strip()}
+        else:
+            ext_dict = {'host': extend.strip()}
+        
+        self.host = ext_dict.get('host', '').strip()
+        self.token = ext_dict.get('token', '').strip()
+        # 新增：读取ext配置中的用户名和密码
+        self.username = ext_dict.get('username', '').strip()
+        self.password = ext_dict.get('password', '').strip()
+        key_str = ext_dict.get('key', '').strip()
+        iv_str = ext_dict.get('iv', '').strip()
+        
+        from_config = ext_dict.get('from', '')
+        line_order_input = ext_dict.get('line_order', '')
+        
+        if from_config:
+            self.line_order, self.block_keywords = self.parse_config_str(from_config)
+        elif line_order_input:
+            if isinstance(line_order_input, list):
+                line_order_input = ','.join(line_order_input)
+            self.line_order, self.block_keywords = self.parse_config_str(line_order_input)
+        
+        if key_str and iv_str:
+            self.use_encrypt = True
+            self.aes_key, self.aes_iv = key_str.encode('utf-8'), iv_str.encode('utf-8')
+        else:
+            self.use_encrypt = False
+        
+        if not self.host.startswith('http'):
+            return {}
+        
+        self.local_uuid = str(uuid.uuid4())
+        self.headers.update({'appto-local-uuid': self.local_uuid, 'token': self.token})
+        
+        url = f'{self.host}/addons/apptov4/app.php/v1/config/get?p=android&__platform=android'
+        response_data = self.fetch_with_decrypt(url, headers=self.headers)
+        
+        data = response_data.get('data', {}) if 'data' in response_data else response_data
+        self.config = data
+        
+        parsing_conf = data.get('get_parsing', [])
+        self.parsing_config = {
+            i['key']: [j['label'] for j in i['config'] if j.get('type') == 'json']
+            for i in parsing_conf if i.get('config')
+        }
+        
+        return {}
+    except:
+        return {}
