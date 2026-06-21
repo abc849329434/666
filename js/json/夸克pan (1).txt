@@ -1,0 +1,13 @@
+{
+"主页":"http://雨滴雨滴雨滴雨滴滴.com",
+"首页": "0",
+"请求头": "User-Agent$MOBILE_UA",
+"分类url": "https://s.panhunt.com/api/search?kw={cateId}&&cloud_types=quark;;z",
+"分类": "穿越&重生&古装&复仇&强者&悬疑&甜宠&神豪&虐恋&逆袭&萌宝",
+"数组": "j:data.merged_by_type.quark",
+"标题": "j:note",
+"副标题": "datetime\":*\"&&T",
+"图片": "images\":*\\[\"&&\"||https://img1.baidu.com/it/u=4163099265,2664190037&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500",
+"链接": "j:url[替换:http>>push://http]",
+"搜索url": "https://s.panhunt.com/api/search?kw={wd}&cloud_types=quark"
+}
