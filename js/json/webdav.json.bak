@@ -1,0 +1,32 @@
+[
+    {
+        "name": "七米藍",
+        "server": "https://al.chirmyram.com:443/dav",
+        "user": "alist",
+        "pass": "alist"
+    },
+    {
+        "name": "热心网友",
+        "server": "https://pan.lm379.cn:443/dav",
+        "user": "public_dav",
+        "pass": "public"
+    },
+    {
+        "name": "公益1",
+        "server": "http://47.107.173.98:12395/dav",
+        "user": "sky",
+        "pass": "sky123"
+    },
+    {
+        "name": "公益2",
+        "server": "http://106.115.23.113:5255/dav",
+        "user": "123",
+        "pass": "123"
+    },
+    {
+        "name": "公益3",
+        "server": "https://pan.clun.top/443/dav",
+        "user": "tvbox",
+        "pass": "tvbox"
+    }
+]
