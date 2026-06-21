@@ -1,0 +1,387 @@
+# coding = utf-8
+# 神马模板 - 最终稳定版（修复播放JSON解析）
+import re, sys, json, base64, urllib3, random, hashlib, time, urllib.parse
+from Crypto.Cipher import ARC4, PKCS1_v1_5
+from Crypto.PublicKey import RSA
+from base.spider import Spider
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+class Spider(Spider):
+    bodydata = "wjBO%2B0pJGs6v%2BcG2gYZNkja9nV80T%2BZb1gOWrqpuyqtTHnW6jUWbY%2FYGdSyQM9EX"
+    bodysign = "cjJ1cjJjclZVVGN3ZlNXSg%3D%3D%0A"
+    os = "35"
+    accountRegisterrc4key = 'GN8ZGa4DmaHQrHhSTyQ3FwnhCQt68EXQ'
+    RSA_PUB_KEY = '''-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDDhDsC9VMan+FiKszyYKzxzrZTrw6MSUJx8hrQ36Oo1R5xHfeV042GqoZyvw3/k2c+O1avFE5ym5liC8pFCOX+FydokVAr6MasQr4/cpUQxtG2Sm3+C7hwGal4ECDsT9Zwlk7mIKJZuO+fuKLNwtX0Q5qR33lZggHnKxVFy/EXNwIDAQAB
+-----END PUBLIC KEY-----'''
+    SERVER_SALT = "G25zqaNtpQW1rJ96ZKIPLHSvGHb1M0kRCG0="
+    KEY_SUFFIX = hashlib.md5(SERVER_SALT.encode()).hexdigest()
+    RC4_KEY = hashlib.md5((SERVER_SALT + KEY_SUFFIX).encode()).hexdigest().lower()
+
+    BASE_HEADERS = {
+        'User-Agent': 'okhttp/3.14.9',
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+    }
+
+    host = ''
+    api_base = ''
+    sign_key = ''
+    client_api = ''
+    app = ''
+    edition = ''
+    machineid = ''
+    rc4key = ''
+    token = ''
+    name = ''
+    vod_name = ''
+    sort_rule = []
+
+    def getName(self):
+        return "神马模板"
+
+    def isVideoFormat(self, url):
+        return False
+
+    def manualVideoCheck(self):
+        return False
+
+    def destroy(self):
+        pass
+
+    def localProxy(self, params):
+        return None
+
+    def init(self, extend=''):
+        ext = json.loads(extend.strip())
+        self.host = ext['host'].rstrip('/')
+        self.rc4key = ext.get('rc4key', '')
+        self.api_base = ext.get('api_base', '').rstrip('/')
+        self.sign_key = ext.get('sign_key', '')
+        self.client_api = ext.get('client_api', '/Client/').lstrip('/')
+        self.app = ext.get('app', '')
+        self.edition = ext.get('edition', '')
+        self.machineid = ext.get('machineid', '')
+
+        sort_str = ext.get('排序', '')
+        if sort_str:
+            self.sort_rule = [s.strip() for s in sort_str.split('>')]
+
+        print("[INIT] 配置完成，开始登录...")
+        self._login_and_get_token()
+
+    # ========== 账户 & 缓存 ==========
+    def _login_and_get_token(self):
+        cache_token = self.getCache('shenma_token') or ''
+        cache_name = self.getCache('shenma_name') or ''
+        if cache_token and cache_name:
+            try:
+                info = self._get_vip_info(cache_token)
+                if not self._is_vip_expired(info.get('vip', '0')):
+                    self.token = cache_token
+                    self.name = cache_name
+                    print("[LOGIN] 缓存 token 有效")
+                    return
+            except Exception as e:
+                print(f"[LOGIN] 缓存 token 验证失败: {e}")
+
+        try:
+            self.name = self.machineid or self._get_uuid()
+            self._register_account(self.name, self.app)
+            self.token = self._login_account(self.name, self.app)
+            self.setCache('shenma_token', self.token)
+            self.setCache('shenma_name', self.name)
+            print(f"[LOGIN] 新注册登录成功, name={self.name}")
+        except Exception as e:
+            print(f"[LOGIN] 登录失败: {e}")
+            self.token = ''
+
+    def _get_uuid(self):
+        return ''.join(random.choice('0123456789abcdef') for _ in range(8))
+
+    def _register_account(self, name, app):
+        t = str(int(time.time()))
+        rawData = f"user={name}&password={name}&markcode={name}&t={t}"
+        data = self._rc4_encrypt(rawData, self.accountRegisterrc4key).lower()
+        sign = hashlib.md5(f"{rawData}&{self.sign_key}".encode()).hexdigest()
+        body = f"data={data}&sign={sign}"
+        url = f"{self.api_base}/api.php?app={app}&act=user_reg"
+        resp = self.post(url, headers=self.BASE_HEADERS, data=body)
+        print(f"[REG] 状态码: {resp.status_code}")
+
+    def _login_account(self, name, app):
+        t = str(int(time.time()))
+        logonData = f"account={name}&password={name}&markcode={name}&t={t}"
+        data = self._rc4_encrypt(logonData, self.accountRegisterrc4key).lower()
+        sign = hashlib.md5(f"{logonData}&{self.sign_key}".encode()).hexdigest()
+        body = f"data={data}&sign={sign}"
+        url = f"{self.api_base}/api.php?app={app}&act=user_logon"
+        resp = self.post(url, headers=self.BASE_HEADERS, data=body)
+        print(f"[LOGIN] 状态码: {resp.status_code}, 响应前100字符: {resp.text[:100]}")
+        msg = resp.json()['msg']
+        decrypted = self._rc4_decrypt(msg, self.accountRegisterrc4key)
+        return json.loads(decrypted)['token']
+
+    def _get_vip_info(self, token):
+        t = str(int(time.time()))
+        token_data = f"token={token}&t={t}"
+        data = self._rc4_encrypt(token_data, self.accountRegisterrc4key).lower()
+        sign = hashlib.md5(f"{token_data}&{self.sign_key}".encode()).hexdigest()
+        body = f"data={data}&sign={sign}"
+        resp = self.post(f"{self.api_base}/api.php?app={self.app}&act=get_info",
+                         data=body, headers=self.BASE_HEADERS)
+        msg = resp.json().get('msg', '')
+        decrypted = self._rc4_decrypt(msg, self.accountRegisterrc4key)
+        return json.loads(decrypted)
+
+    def _is_vip_expired(self, vip_timestamp):
+        if vip_timestamp == "999999999":
+            return False
+        return int(vip_timestamp) < int(time.time())
+
+    # ========== 加解密 ==========
+    def _rc4_encrypt(self, word, key):
+        cipher = ARC4.new(key.encode('utf-8'))
+        return cipher.encrypt(word.encode('utf-8')).hex()
+
+    def _rc4_decrypt(self, word, key):
+        if re.match(r'^[0-9a-fA-F]+$', word):
+            ciphertext = bytes.fromhex(word)
+        elif re.match(r'^[0-9a-zA-Z\+\/]+(={0,2})$', word) and len(word) % 4 == 0:
+            ciphertext = base64.b64decode(word)
+        else:
+            return word
+        cipher = ARC4.new(key.encode('utf-8'))
+        return cipher.decrypt(ciphertext).decode('utf-8', errors='ignore')
+
+    def _decrypt_response(self, raw_text):
+        try:
+            obj = json.loads(raw_text)
+            if isinstance(obj, dict) and 'data' in obj:
+                print("[DEC] 响应直接是明文 JSON")
+                return obj
+        except:
+            pass
+
+        if self.rc4key:
+            return self._rc4_decrypt(raw_text, self.rc4key)
+        try:
+            rsa_res = self._rsa_decrypt(raw_text, self.RSA_PUB_KEY)
+            rot13_str = self._rot13(rsa_res)
+            decrypted = self._rc4_decrypt(rot13_str, self.RC4_KEY)
+            return json.loads(decrypted)
+        except:
+            return raw_text
+
+    def _rsa_decrypt(self, encrypted_b64, pubkey_pem):
+        key = RSA.import_key(pubkey_pem)
+        cipher = PKCS1_v1_5.new(key)
+        encrypted_data = base64.b64decode(encrypted_b64)
+        return cipher.decrypt(encrypted_data, None).decode('utf-8')
+
+    def _rot13(self, text):
+        def rot(c):
+            if 'a' <= c <= 'z': return chr((ord(c)-97+13)%26 + 97)
+            if 'A' <= c <= 'Z': return chr((ord(c)-65+13)%26 + 65)
+            return c
+        return ''.join(rot(c) for c in text)
+
+    def _sort_video_list(self, vlist):
+        if not self.sort_rule or not vlist:
+            return vlist
+        def sk(item):
+            ln = item.get('type', '')
+            for i, r in enumerate(self.sort_rule):
+                if r in ln:
+                    return i
+            return len(self.sort_rule)
+        vlist.sort(key=sk)
+        return vlist
+
+    # ========== 核心功能 ==========
+    def homeContent(self, filter):
+        t = str(int(time.time()))
+        key = self._rc4_encrypt(t, t)
+        body = f"time={t}&key={key}&"
+        url = f"{self.host}/api.php/smtv/Category"
+        print(f"[HOME] 请求URL: {url}")
+        print(f"[HOME] 请求体: {body}")
+        try:
+            resp = self.post(url, headers=self.BASE_HEADERS, data=body)
+            print(f"[HOME] 状态码: {resp.status_code}")
+            print(f"[HOME] 响应全文: {resp.text[:500]}")
+            raw = resp.json()
+        except Exception as e:
+            print(f"[HOME] 请求失败: {e}")
+            return {"class": [], "filters": {}}
+
+        if isinstance(raw, list):
+            data = raw
+        elif isinstance(raw, dict) and 'data' in raw:
+            data = raw['data']
+        else:
+            data = []
+        classes = [{"type_id": c['type_en'].lower(), "type_name": c['type_name']} for c in data]
+        print(f"[HOME] 获取到 {len(classes)} 个分类")
+        return {"class": classes, "filters": {}}
+
+    def homeVideoContent(self):
+        return {'list': []}
+
+    def categoryContent(self, cid, pg, filter, ext):
+        t = str(int(time.time()))
+        key = self._rc4_encrypt(t, t)
+        body = f"data={self.bodydata}&os={self.os}&sign={self.bodysign}&time={t}&key={key}&"
+        url = f"{self.host}/api.php/smtv/vod/?ac=list&class={cid}&page={pg}"
+        print(f"[CATE] 请求URL: {url}")
+        resp = self.post(url, headers=self.BASE_HEADERS, data=body)
+        print(f"[CATE] 状态码: {resp.status_code}, 响应前200字符: {resp.text[:200]}")
+        data = self._decrypt_response(resp.text)
+        if isinstance(data, str):
+            data = json.loads(data)
+        videos = []
+        for item in data.get('data', []):
+            videos.append({
+                "vod_id": self.host + "/api.php/smtv/vod/" + item['nextlink'],
+                "vod_name": item['title'],
+                "vod_pic": item['pic'],
+                "vod_remarks": item['state']
+            })
+        print(f"[CATE] 获取到 {len(videos)} 个视频")
+        return {'list': videos, 'page': pg, 'pagecount': 9999, 'limit': 90, 'total': 999999}
+
+    def detailContent(self, ids):
+        input_url = ids[0]
+        if input_url.startswith(self.host):
+            pass
+        elif not input_url.startswith('http'):
+            input_url = self.host + "/api.php/smtv/vod/" + input_url
+        t = str(int(time.time()))
+        key = self._rc4_encrypt(t, t)
+        body = f"data={self.bodydata}&os={self.os}&sign={self.bodysign}&time={t}&key={key}&"
+        print(f"[DETAIL] 请求URL: {input_url}")
+        resp = self.post(input_url, headers=self.BASE_HEADERS, data=body)
+        print(f"[DETAIL] 状态码: {resp.status_code}, 响应前200字符: {resp.text[:200]}")
+        data = self._decrypt_response(resp.text)
+        if isinstance(data, str):
+            data = json.loads(data)
+
+        self.vod_name = data.get('title', '')
+        vlist = self._sort_video_list(data.get('video_list', []))
+
+        from_list = []
+        url_list = []
+        for v in vlist:
+            from_list.append(v['type'])
+            eps = '#'.join([f"{ep['title']}${ep['url']}\x01{ep['title']}" for ep in v['list']])
+            url_list.append(eps)
+
+        print(f"[DETAIL] 解析到 {sum(len(v['list']) for v in vlist)} 个剧集")
+        return {'list': [{
+            "vod_id": input_url,
+            "vod_name": data.get('title', ''),
+            "vod_pic": data.get('img_url', ''),
+            "vod_remarks": data.get('trunk', ''),
+            "vod_content": data.get('intro', ''),
+            "vod_play_from": '$$$'.join(from_list),
+            "vod_play_url": '$$$'.join(url_list)
+        }]}
+
+    def searchContent(self, key, quick, pg="1"):
+        t = str(int(time.time()))
+        key_enc = self._rc4_encrypt(t, t)
+        body = f"data={self.bodydata}&os={self.os}&sign={self.bodysign}&time={t}&key={key_enc}&"
+        url = f"{self.host}/api.php/smtv/vod/?ac=list&zm={key}&page={pg}"
+        print(f"[SEARCH] 请求URL: {url}")
+        resp = self.post(url, headers=self.BASE_HEADERS, data=body)
+        print(f"[SEARCH] 状态码: {resp.status_code}, 响应前200字符: {resp.text[:200]}")
+        data = self._decrypt_response(resp.text)
+        if isinstance(data, str):
+            data = json.loads(data)
+        videos = []
+        for item in data.get('data', []):
+            videos.append({
+                "vod_id": self.host + "/api.php/smtv/vod/" + item['nextlink'],
+                "vod_name": item['title'],
+                "vod_pic": item['pic'],
+                "vod_remarks": item['state']
+            })
+        print(f"[SEARCH] 获取到 {len(videos)} 个结果")
+        return {'list': videos, 'page': pg, 'pagecount': 9999, 'limit': 90, 'total': 999999}
+
+    def playerContent(self, flag, vid, vipFlags):
+        # 分割 URL 和标题
+        if '\x01' in vid:
+            url, title = vid.split('\x01', 1)
+        elif '|' in vid:
+            url, title = vid.split('|', 1)
+        else:
+            url = vid
+            title = ''
+
+        if not title:
+            title = self.vod_name or url.split('/')[-1]
+
+        params = {
+            'url': url,
+            'app': self.app,
+            'account': self.name,
+            'password': self.name,
+            'token': self.token,
+            'machineid': self.machineid or self.name,
+            'edition': self.edition,
+            'vodname': title,
+            'line': flag,
+            'new': '1'
+        }
+        # 修复双问号问题
+        if self.client_api.endswith('?'):
+            self.client_api = self.client_api.rstrip('?')
+        play_url = f"{self.api_base}/{self.client_api}?{urllib.parse.urlencode(params)}"
+        headers = {
+            'Authorization': 'Basic c2hlbm1hOnNoZW5tYQ==',
+            'User-Agent': 'okhttp/3.14.9',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+        print(f"[PLAYER] 请求播放地址: {play_url[:120]}...")
+        resp = self.fetch(play_url, headers=headers)
+        print(f"[PLAYER] 状态码: {resp.status_code}, 响应前200字符: {resp.text[:200]}")
+
+        # 提取第一个完整的 JSON 对象（解决响应中混入额外数据的问题）
+        json_text = resp.text.strip()
+        start = json_text.find('{')
+        if start == -1:
+            print("[PLAYER] 响应中未找到 JSON 起始符")
+            return {"parse": 0, "url": url}
+        brace_count = 0
+        end = start
+        for i, ch in enumerate(json_text[start:], start):
+            if ch == '{':
+                brace_count += 1
+            elif ch == '}':
+                brace_count -= 1
+                if brace_count == 0:
+                    end = i
+                    break
+        if end == start:
+            print("[PLAYER] 未找到完整的 JSON 对象")
+            return {"parse": 0, "url": url}
+        json_str = json_text[start:end+1]
+        print(f"[PLAYER] 提取的 JSON: {json_str[:200]}")
+
+        try:
+            data = json.loads(json_str)
+            video_url = data.get('data', {}).get('url', '')
+            if data.get('encrypt') == '1' and video_url:
+                video_url = self._rc4_decrypt(video_url, self.sign_key)
+            if video_url:
+                print(f"[PLAYER] 最终视频地址: {video_url[:80] if video_url else 'EMPTY'}...")
+                return {"parse": 0, "url": video_url, "header": data.get('data', {}).get('header', {})}
+        except Exception as e:
+            print(f"[PLAYER] JSON解析失败: {e}")
+
+        print("[PLAYER] 未找到有效播放地址，返回原始URL")
+        return {"parse": 0, "url": url}
+
+    def search(self, wd, quick='', pg='1'):
+        return self.searchContent(wd, quick, pg)
