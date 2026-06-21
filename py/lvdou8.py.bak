@@ -1,0 +1,513 @@
+# -*- coding: utf-8 -*-
+
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+from base.spider import Spider
+from urllib.parse import unquote_plus
+
+import re
+import sys
+import json
+import base64
+import urllib3
+import random
+import requests
+import time
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+sys.path.append('..')
+
+
+class Spider(Spider):
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0'
+    }
+
+    # =========================
+    # 静态代理池
+    # =========================
+    PROXY_POOL = [
+        'http://120.46.190.255:8080',
+        'http://112.74.105.128:8080',
+        'http://183.247.211.43:8080',
+        'http://117.85.105.170:8080',
+        'http://121.232.148.241:8080',
+        'http://118.212.104.207:8080',
+        'http://117.87.178.123:8080',
+        'http://183.166.102.23:8080',
+    ]
+
+    # =========================
+    # 动态IP池
+    # =========================
+    dynamic_ip_pool = []
+    last_refresh = 0
+    refresh_interval = 3600
+
+    # =========================
+    # UA池
+    # =========================
+    USER_AGENTS = [
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36',
+        'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/120.0 Mobile Safari/537.36',
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_2 like Mac OS X) AppleWebKit/605.1.15 Mobile Safari/604.1',
+        'okhttp/4.12.0',
+        'Dalvik/2.1.0 (Linux; U; Android 12)',
+    ]
+
+    # =========================
+    # 本地代理
+    # =========================
+    def localProxy(self, params):
+
+        if params.get('type') == 'ryjx':
+
+            try:
+
+                data = self.ry_jx(params)
+
+                return [200, 'text/json;charset=utf-8', data]
+
+            except Exception as e:
+
+                return [
+                    400,
+                    'text/json;charset=utf-8',
+                    self.json_encode({
+                        "code": "400",
+                        "msg": str(e)
+                    })
+                ]
+
+        return None
+
+    # =========================
+    # 生成动态IP池
+    # =========================
+    def generate_million_ips(self):
+
+        ip_pool = []
+
+        ports = [80, 8080, 3128, 443, 8443, 8888]
+
+        for _ in range(5000):
+
+            a = random.randint(1, 223)
+            b = random.randint(0, 255)
+            c = random.randint(0, 255)
+            d = random.randint(1, 254)
+
+            if a == 10:
+                continue
+
+            if a == 127:
+                continue
+
+            if a == 192 and b == 168:
+                continue
+
+            if a == 172 and 16 <= b <= 31:
+                continue
+
+            ip = f"http://{a}.{b}.{c}.{d}:{random.choice(ports)}"
+
+            ip_pool.append(ip)
+
+        return ip_pool
+
+    # =========================
+    # 获取动态IP池
+    # =========================
+    def get_dynamic_ips(self):
+
+        now = time.time()
+
+        if (
+                not self.dynamic_ip_pool
+                or now - self.last_refresh > self.refresh_interval
+        ):
+
+            self.dynamic_ip_pool = self.generate_million_ips()
+
+            self.last_refresh = now
+
+        return self.dynamic_ip_pool
+
+    # =========================
+    # 获取随机代理
+    # =========================
+    def get_random_proxy(self):
+
+        try:
+
+            if random.random() < 0.7:
+
+                dynamic_pool = self.get_dynamic_ips()
+
+                return random.choice(dynamic_pool)
+
+            return random.choice(self.PROXY_POOL)
+
+        except:
+
+            return None
+
+    # =========================
+    # 生成伪造IP
+    # =========================
+    def generate_fake_ip(self):
+
+        while True:
+
+            a = random.randint(1, 223)
+            b = random.randint(0, 255)
+            c = random.randint(0, 255)
+            d = random.randint(1, 254)
+
+            if a == 10:
+                continue
+
+            if a == 127:
+                continue
+
+            if a == 192 and b == 168:
+                continue
+
+            if a == 172 and 16 <= b <= 31:
+                continue
+
+            return f"{a}.{b}.{c}.{d}"
+
+    # =========================
+    # 构建Headers
+    # =========================
+    def build_headers(self):
+
+        fake_ip = self.generate_fake_ip()
+
+        return {
+            'User-Agent': random.choice(self.USER_AGENTS),
+            'X-Forwarded-For': fake_ip,
+            'X-Real-IP': fake_ip,
+            'CF-Connecting-IP': fake_ip,
+            'Client-IP': fake_ip,
+        }
+
+    # =========================
+    # 增强fetch
+    # =========================
+    def proxy_fetch(self, url, timeout=10):
+
+        headers = self.build_headers()
+
+        proxy = self.get_random_proxy()
+
+        proxies = None
+
+        if proxy:
+
+            proxies = {
+                'http': proxy,
+                'https': proxy
+            }
+
+        try:
+
+            r = requests.get(
+                url,
+                headers=headers,
+                timeout=timeout,
+                verify=False,
+                proxies=proxies
+            )
+
+            return r.text
+
+        except Exception:
+
+            try:
+
+                r = requests.get(
+                    url,
+                    headers=headers,
+                    timeout=timeout,
+                    verify=False
+                )
+
+                return r.text
+
+            except:
+
+                return None
+
+    # =========================
+    # 主解析
+    # =========================
+    def ry_jx(self, params):
+
+        error_msg = self.json_encode({
+            "code": "400",
+            "success": "0",
+            "msg": "URL或API为空"
+        })
+
+        try:
+
+            v = params['v']
+
+            api = unquote_plus(params['api'])
+
+            if not (v and api.startswith('http')):
+
+                return error_msg
+
+        except Exception:
+
+            return error_msg
+
+        try:
+
+            html = self.proxy_fetch(f'{api}{v}')
+
+            if not html:
+
+                return self.json_encode({
+                    "code": "-1",
+                    "msg": "请求失败"
+                })
+
+            data = json.loads(html)
+
+        except Exception:
+
+            return self.json_encode({
+                "code": "-1",
+                "msg": "请求或json解析失败"
+            })
+
+        dat_vurl = data.get('url', '')
+
+        video_url = self.common_decrypt(dat_vurl)
+
+        if not self.is_valid_url(video_url):
+
+            return self.json_encode({
+                "code": "-3",
+                "msg": "解密失败"
+            })
+
+        data['url'] = video_url
+
+        for k in ('type', 'ip', 'player', 'From'):
+            data.pop(k, None)
+
+        data['from'] = v
+
+        return self.json_encode(data)
+
+    # =========================
+    # 通用解密
+    # =========================
+    def common_decrypt(self, dat_vurl):
+
+        if not dat_vurl:
+            return None
+
+        dat_vurl = str(dat_vurl).strip()
+
+        # 原始URL
+        if self.is_valid_url(dat_vurl):
+            return dat_vurl
+
+        # URL解码
+        try:
+
+            tmp = unquote_plus(dat_vurl)
+
+            if self.is_valid_url(tmp):
+                return tmp
+
+            dat_vurl = tmp
+
+        except:
+            pass
+
+        # Base64一次
+        try:
+
+            dat_vurl += '=' * (-len(dat_vurl) % 4)
+
+            b64 = base64.b64decode(dat_vurl).decode(
+                'utf-8',
+                errors='ignore'
+            )
+
+            if self.is_valid_url(b64):
+                return b64
+
+            dat_vurl = b64
+
+        except:
+            pass
+
+        # Base64二次
+        try:
+
+            dat_vurl += '=' * (-len(dat_vurl) % 4)
+
+            b642 = base64.b64decode(dat_vurl).decode(
+                'utf-8',
+                errors='ignore'
+            )
+
+            if self.is_valid_url(b642):
+                return b642
+
+        except:
+            pass
+
+        # ldmax
+        if (
+                "ldmax.cooom" in dat_vurl
+                or dat_vurl.startswith("aHR0cHM6Ly9sZG1heC5jb29vbS")
+        ):
+
+            result = self.decrypt_ldmax_cooom(
+                base64.b64encode(
+                    dat_vurl.encode()
+                ).decode()
+            )
+
+            if result and self.is_valid_url(result):
+                return result
+
+        return None
+
+    # =========================
+    # ldmax解密
+    # =========================
+    def decrypt_ldmax_cooom(self, encrypted_b64_url):
+
+        try:
+
+            encrypted_b64_url += '=' * (
+                    -len(encrypted_b64_url) % 4
+            )
+
+            decoded = base64.b64decode(
+                encrypted_b64_url
+            ).decode('utf-8')
+
+        except:
+
+            return None
+
+        if "ldmax.cooom" not in decoded:
+            return decoded
+
+        prefix = "https://ldmax.cooom/"
+
+        if not decoded.startswith(prefix):
+            return None
+
+        body = decoded[len(prefix):]
+
+        if len(body) < 16:
+            return None
+
+        key_raw = body[:16]
+
+        key = key_raw[::-1]
+
+        cipher_b64 = body[16:]
+
+        try:
+
+            ciphertext = base64.b64decode(cipher_b64)
+
+            cipher = AES.new(
+                key.encode(),
+                AES.MODE_CBC,
+                key.encode()
+            )
+
+            plaintext = cipher.decrypt(ciphertext)
+
+            plaintext = unpad(
+                plaintext,
+                AES.block_size
+            )
+
+            return plaintext.decode('utf-8')
+
+        except:
+
+            return None
+
+    # =========================
+    # URL检测
+    # =========================
+    def is_valid_url(self, url):
+
+        if not url:
+            return False
+
+        url = str(url).strip()
+
+        if url in ['null', 'None', 'undefined']:
+            return False
+
+        return re.match(
+            r'^(https?|rtmp|rtsp)://.+',
+            url,
+            re.I
+        ) is not None
+
+    # =========================
+    # JSON
+    # =========================
+    def json_encode(self, arr):
+
+        return json.dumps(
+            arr,
+            ensure_ascii=False,
+            indent=2
+        )
+
+    # =========================
+    # 空实现
+    # =========================
+    def init(self, extend=''):
+        pass
+
+    def homeContent(self, filter):
+        pass
+
+    def homeVideoContent(self):
+        pass
+
+    def categoryContent(self, tid, pg, filter, extend):
+        pass
+
+    def searchContent(self, key, quick, pg='1'):
+        pass
+
+    def detailContent(self, ids):
+        pass
+
+    def playerContent(self, flag, id, vipflags):
+        pass
+
+    def getName(self):
+        pass
+
+    def isVideoFormat(self, url):
+        pass
+
+    def manualVideoCheck(self):
+        pass
+
+    def destroy(self):
+        pass
