@@ -1,0 +1,32 @@
+{
+    "vodPic": "https://x.imgs.ovh/x/2023/09/05/64f680bb030b4.png",
+    "drives": [
+        {
+            "name": "Ecve",
+            "server": "https://pan.ecve.cn/"
+        },
+        {
+            "name": "小雅2",
+            "server": "http://ip:35244/天翼网盘/",
+            "startPage": "/",
+            "showAll": false,
+            "search": true
+        },
+        {
+            "name": "小鸭",
+            "server": "https://pan.mediy.cn/"
+        },
+        {
+            "name": "秋雨",
+            "server": "https://share.qiuyu.org/"
+        },
+        {
+            "name": "小雅",
+            "server": "http://alist.xiaoya.pro/"
+        },
+        {
+            "name": "七米蓝",
+            "server": "https://al.chirmyram.com/"
+        }
+    ]
+}
