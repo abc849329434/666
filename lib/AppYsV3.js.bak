@@ -1,0 +1,159 @@
+import { Crypto, _ } from 'assets://js/lib/cat.js'
+
+let host = ''
+let siteJx = {}
+
+/* ================= 正则 ================= */
+const urlPattern1 = /api\.php\/.*?\/vod/
+const parsePattern1 = /.*(url|v|vid|php\?id)=/
+
+/* ================= 初始化 ================= */
+async function init(cfg) {
+    host = cfg.ext.host || cfg.ext
+    siteJx = cfg.ext || {}
+}
+
+/* ================= 请求 ================= */
+async function request(reqUrl) {
+    return await req(reqUrl, {
+        headers: {
+            'User-Agent': 'okhttp/3.12.11'
+        }
+    }).then(r => r.content)
+}
+
+/* ================= 分类 ================= */
+async function home() {
+    const url = host + 'nav?token='
+    const json = await request(url)
+    const obj = JSON.parse(json)
+
+    const cls = obj.data.map(i => ({
+        type_id: String(i.type_id),
+        type_name: i.type_name
+    }))
+
+    return JSON.stringify({ class: cls })
+}
+
+/* ================= 推荐 ================= */
+async function homeVod() {
+    const url = host + 'index_video?token='
+    const json = await request(url)
+    const obj = JSON.parse(json)
+
+    const list = obj.data.map(i => ({
+        vod_id: String(i.vod_id),
+        vod_name: i.vod_name,
+        vod_pic:0 i.vod_pic,
+        vod_remarks: i.vod_remarks
+    }))
+
+    return JSON.stringify({ list })
+}
+
+/* ================= 分类翻页 ================= */
+async function category(tid, pg) {
+    const url = `${host}video?tid=${tid}&pg=${pg}`
+    const json = await request(url)
+    const obj = JSON.parse(json)
+
+    const list = obj.data.map(i => ({
+        vod_id: String(i.vod_id),
+        vod_name: i.vod_name,
+        vod_pic: i.vod_pic,
+        vod_remarks: i.vod_remarks
+    }))
+
+    return JSON.stringify({
+        page: pg,
+        pagecount: obj.totalpage || 1,
+        list
+    })
+}
+
+/* ================= 详情（核心） ================= */
+async function detail(ids) {
+    const url = host + 'video_detail?id=' + ids[0]
+    const json = await request(url)
+    const obj = JSON.parse(json).data
+
+    /* 线路名替换 */
+    const froms = []
+    const urls = []
+
+    obj.vod_url_with_player.forEach(p => {
+        let flag = p.code || p.name
+        if (siteJx.lineReplace) {
+            const [o, n] = siteJx.lineReplace.split('_')
+            flag = flag.replace(new RegExp(o, 'g'), n)
+        }
+        froms.push(flag)
+        urls.push(p.url)
+    })
+
+    const vod = {
+        vod_id: String(obj.vod_id),
+        vod_name: obj.vod_name,
+        vod_pic: obj.vod_pic,
+        vod_remarks: obj.vod_remarks,
+        vod_content:
+            (siteJx.linePrefix || '') +
+            '\n' +
+            (siteJx.contentPrefix || '') +
+            '\n\n' +
+            (obj.vod_content || ''),
+        vod_play_from: froms.join('$$$'),
+        vod_play_url: urls.join('$$$')
+    }
+
+    return JSON.stringify({ list: [vod] })
+}
+
+/* ================= 播放 ================= */
+function isVideo(url) {
+    return /\.(m3u8|mp4)(\?|$)/i.test(url)
+}
+
+async function play(flag, id) {
+    if (isVideo(id)) {
+        return JSON.stringify({
+            parse: 0,
+            url: id
+        })
+    }
+    return JSON.stringify({
+        parse: 1,
+        jx: '1',
+        url: id
+    })
+}
+
+/* ================= 搜索 ================= */
+async function search(key) {
+    const url = host + 'search?text=' + encodeURIComponent(key) + '&pg=1'
+    const json = await request(url)
+    const obj = JSON.parse(json)
+
+    const list = obj.data.map(i => ({
+        vod_id: String(i.vod_id),
+        vod_name: i.vod_name,
+        vod_pic: i.vod_pic,
+        vod_remarks: i.vod_remarks
+    }))
+
+    return JSON.stringify({ list })
+}
+
+/* ================= 导出 ================= */
+export function __jsEvalReturn() {
+    return {
+        init,
+        home,
+        homeVod,
+        category,
+        detail,
+        play,
+        search
+    }
+}
