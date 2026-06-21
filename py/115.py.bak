@@ -1,0 +1,459 @@
+# -*- coding: utf-8 -*-
+# JavBus + 磁力 + 115 秒传 Python 版
+# 适配 TVBox / drpy / 不夜 pySpider 风格
+# Python 3.9+
+
+import re
+import os
+import time
+import json
+import base64
+import hashlib
+import urllib.parse
+
+import requests
+from bs4 import BeautifulSoup
+
+
+UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0 Safari/537.36"
+
+SCRIPT_VERSION = "2026-05-26-javbus-py"
+
+# =========================
+# 115 COOKIE
+# =========================
+
+PAN_115_COOKIE = """
+UID=102499290_R1_1769876709;
+CID=b9da9913cf6f6ce1206ac446738d4dc6;
+SEID=282eda490440b12f9122e9c54995bf56deed1ad88ed46c943d9a6c6f211ce9a3da4830940c1beddd968551db169ff1ec6d307a04d5f95a980a70d2f6;
+KID=78ee45569034ca7aaf204563d02b1d7f;
+""".strip().replace("\n", "")
+
+# =========================
+# JAVBUS COOKIE
+# =========================
+
+JAVBUS_COOKIE = "PHPSESSID=vittq8vf2fhopu6eemc0d452q5; existmag=mag; age=verified;"
+
+# =========================
+# JAVBUS
+# =========================
+
+JAVBUS_BASE = "https://www.javbus.com"
+
+HEADERS = {
+    "User-Agent": UA,
+    "Cookie": JAVBUS_COOKIE,
+    "Referer": JAVBUS_BASE + "/",
+}
+
+session = requests.Session()
+session.headers.update(HEADERS)
+session.verify = False
+
+
+# =========================
+# 工具
+# =========================
+
+def text(v):
+    return str(v or "").strip()
+
+
+def md5(s):
+    return hashlib.md5(text(s).encode()).hexdigest()
+
+
+def abs_url(url):
+    if not url:
+        return ""
+    return urllib.parse.urljoin(JAVBUS_BASE + "/", url)
+
+
+def clean(s):
+    return re.sub(r"\s+", " ", text(s)).strip()
+
+
+def encode_id(obj):
+    raw = json.dumps(obj, ensure_ascii=False)
+    return base64.b64encode(raw.encode()).decode()
+
+
+def decode_id(s):
+    try:
+        return json.loads(base64.b64decode(s).decode())
+    except:
+        return {}
+
+
+def normalize_magnet(url):
+    url = text(url)
+    m = re.search(r'btih:([0-9a-fA-F]{32,40})', url)
+    if not m:
+        return ""
+    return "magnet:?xt=urn:btih:" + m.group(1)
+
+
+def safe_name(name):
+    return re.sub(r'[\\/:*?"<>|#$]', ' ', text(name)).strip()
+
+
+# =========================
+# 请求
+# =========================
+
+def get_html(url):
+    r = session.get(abs_url(url), timeout=20)
+    r.encoding = "utf-8"
+    return r.text
+
+
+# =========================
+# 首页分类
+# =========================
+
+def homeContent(filter=False):
+    classes = [
+        {"type_id": "censored", "type_name": "有码"},
+        {"type_id": "uncensored", "type_name": "无码"},
+        {"type_id": "western", "type_name": "欧美"},
+        {"type_id": "hd", "type_name": "高清"},
+        {"type_id": "sub", "type_name": "字幕"},
+    ]
+
+    return {
+        "class": classes
+    }
+
+
+# =========================
+# 分类
+# =========================
+
+def categoryContent(tid, pg, filter=False, extend={}):
+    pg = int(pg or 1)
+
+    path_map = {
+        "censored": "/",
+        "uncensored": "/uncensored",
+        "western": "https://www.javbus.org/",
+        "hd": "/genre/hd",
+        "sub": "/genre/sub",
+    }
+
+    path = path_map.get(tid, "/")
+
+    if pg > 1:
+        path = path.rstrip("/") + "/" + str(pg)
+
+    html = get_html(path)
+
+    soup = BeautifulSoup(html, "html.parser")
+
+    videos = []
+
+    for a in soup.select("a.movie-box"):
+        href = abs_url(a.get("href"))
+
+        code = href.rstrip("/").split("/")[-1]
+
+        img = a.select_one("img")
+
+        title = clean(
+            img.get("title")
+            or img.get("alt")
+            or code
+        )
+
+        pic = abs_url(img.get("src"))
+
+        videos.append({
+            "vod_id": code,
+            "vod_name": title,
+            "vod_pic": pic,
+            "vod_remarks": code
+        })
+
+    return {
+        "list": videos,
+        "page": pg,
+        "pagecount": pg + 1,
+        "limit": 24,
+        "total": 9999
+    }
+
+
+# =========================
+# 搜索
+# =========================
+
+def searchContent(key, quick=False, pg=1):
+    pg = int(pg or 1)
+
+    url = f"/search/{urllib.parse.quote(key)}"
+
+    if pg > 1:
+        url += f"/{pg}"
+
+    html = get_html(url)
+
+    soup = BeautifulSoup(html, "html.parser")
+
+    videos = []
+
+    for a in soup.select("a.movie-box"):
+        href = abs_url(a.get("href"))
+
+        code = href.rstrip("/").split("/")[-1]
+
+        img = a.select_one("img")
+
+        title = clean(
+            img.get("title")
+            or img.get("alt")
+            or code
+        )
+
+        pic = abs_url(img.get("src"))
+
+        videos.append({
+            "vod_id": code,
+            "vod_name": title,
+            "vod_pic": pic,
+            "vod_remarks": code
+        })
+
+    return {
+        "list": videos
+    }
+
+
+# =========================
+# 解析磁力
+# =========================
+
+def parse_magnets(code):
+    html = get_html("/" + code)
+
+    magnets = []
+
+    # 页面直链
+    for m in re.findall(r'magnet:\?xt=urn:btih:[^"\']+', html, re.I):
+        magnet = normalize_magnet(m)
+
+        if magnet and magnet not in magnets:
+            magnets.append(magnet)
+
+    # ajax 磁力
+    gid = re.search(r'var gid\s*=\s*(\d+)', html)
+    uc = re.search(r'var uc\s*=\s*(\d+)', html)
+    img = re.search(r'var img\s*=\s*"([^"]+)"', html)
+
+    if gid:
+        gid = gid.group(1)
+        uc = uc.group(1) if uc else "0"
+        img = img.group(1) if img else ""
+
+        ajax = (
+            f"/ajax/uncledatoolsbyajax.php?"
+            f"gid={gid}&lang=zh&img={urllib.parse.quote(img)}"
+            f"&uc={uc}&floor=1"
+        )
+
+        try:
+            ajax_html = get_html(ajax)
+
+            for m in re.findall(r'magnet:\?xt=urn:btih:[^"\']+', ajax_html, re.I):
+                magnet = normalize_magnet(m)
+
+                if magnet and magnet not in magnets:
+                    magnets.append(magnet)
+
+        except Exception as e:
+            print("ajax magnet error:", e)
+
+    return magnets
+
+
+# =========================
+# 115 秒传
+# =========================
+
+def build115Headers():
+    return {
+        "User-Agent": UA,
+        "Cookie": PAN_115_COOKIE,
+        "Referer": "https://115.com/",
+        "Origin": "https://115.com",
+        "X-Requested-With": "XMLHttpRequest",
+    }
+
+
+def push_magnet_to_115(magnet):
+    try:
+        uid_match = re.search(r'UID=(\d+)', PAN_115_COOKIE)
+
+        if not uid_match:
+            return None
+
+        uid = uid_match.group(1)
+
+        headers = build115Headers()
+
+        # 获取 sign
+        r = requests.get(
+            "https://115.com/?ct=offline&ac=space",
+            headers=headers,
+            timeout=15,
+            verify=False
+        )
+
+        data = r.json()
+
+        if not data.get("state"):
+            return None
+
+        sign = data.get("sign")
+        tm = data.get("time")
+
+        payload = {
+            "url": magnet,
+            "uid": uid,
+            "sign": sign,
+            "time": tm
+        }
+
+        r = requests.post(
+            "https://115.com/web/lixian/?ct=lixian&ac=add_task_url",
+            headers=headers,
+            data=payload,
+            timeout=20,
+            verify=False
+        )
+
+        return r.json()
+
+    except Exception as e:
+        print("115 error:", e)
+        return None
+
+
+# =========================
+# 详情
+# =========================
+
+def detailContent(ids):
+    code = ids[0]
+
+    html = get_html("/" + code)
+
+    soup = BeautifulSoup(html, "html.parser")
+
+    title = clean(
+        soup.select_one("title").text.replace("- JavBus", "")
+    )
+
+    img = soup.select_one(".bigImage img")
+
+    pic = abs_url(img.get("src")) if img else ""
+
+    magnets = parse_magnets(code)
+
+    play_urls = []
+
+    for idx, magnet in enumerate(magnets[:12]):
+        pid = encode_id({
+            "type": "magnet",
+            "url": magnet
+        })
+
+        play_urls.append(
+            f"磁力{idx+1}${pid}"
+        )
+
+    vod = {
+        "vod_id": code,
+        "vod_name": title,
+        "vod_pic": pic,
+        "type_name": "JAV视频",
+        "vod_year": "",
+        "vod_area": "日本",
+        "vod_actor": "",
+        "vod_director": "",
+        "vod_content": title,
+        "vod_play_from": "播放",
+        "vod_play_url": "#".join(play_urls)
+    }
+
+    return {
+        "list": [vod]
+    }
+
+
+# =========================
+# 播放
+# =========================
+
+def playerContent(flag, pid, vipFlags=[]):
+    data = decode_id(pid)
+
+    if data.get("type") == "magnet":
+        magnet = data.get("url")
+
+        # 自动提交 115
+        try:
+            push_magnet_to_115(magnet)
+        except:
+            pass
+
+        return {
+            "parse": 0,
+            "playUrl": "",
+            "url": magnet,
+            "header": {
+                "User-Agent": UA
+            }
+        }
+
+    return {
+        "parse": 1,
+        "url": pid
+    }
+
+
+# =========================
+# spider
+# =========================
+
+class Spider:
+
+    def getName(self):
+        return "JavBus115"
+
+    def init(self, extend=""):
+        pass
+
+    def isVideoFormat(self, url):
+        return True
+
+    def manualVideoCheck(self):
+        pass
+
+    def destroy(self):
+        pass
+
+    def homeContent(self, filter=False):
+        return homeContent(filter)
+
+    def categoryContent(self, tid, pg, filter=False, extend={}):
+        return categoryContent(tid, pg, filter, extend)
+
+    def detailContent(self, ids):
+        return detailContent(ids)
+
+    def searchContent(self, key, quick=False, pg=1):
+        return searchContent(key, quick, pg)
+
+    def playerContent(self, flag, pid, vipFlags=[]):
+        return playerContent(flag, pid, vipFlags)
