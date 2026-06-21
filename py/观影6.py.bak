@@ -1,0 +1,223 @@
+import re
+import sys
+import random
+import base64
+
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+
+from base.spider import Spider
+
+sys.path.append('..')
+
+
+class Spider(Spider):
+
+    headers = {
+        "User-Agent": "okhttp/4.12.0"
+    }
+
+    FIXED_CONFIG = {
+        "hosts": [
+            "http://cms339.lyyytv.cn",
+            "http://pgcms.lyyytv.cn",
+            "http://cms4kzj.lyyytv.cn",
+            "http://cms.lygdyy.cn"
+        ],
+        "cmskey": "wP5btxoc3yv8FoBQENFZumF0EUYr4LTy"
+    }
+
+    PLAY_NAME_POOL = [
+        "线路1", "线路2", "线路3", "线路4", "线路5"
+    ]
+
+    # ================= init =================
+
+    def init(self, extend=''):
+        self.hosts = self.FIXED_CONFIG["hosts"]
+        random.shuffle(self.hosts)
+
+        self.cmskey = self.FIXED_CONFIG["cmskey"]
+
+    # ================= 请求 =================
+
+    def fetch_host(self, path):
+        last = None
+
+        for h in self.hosts:
+            try:
+                url = h.rstrip("/") + "/" + path.lstrip("/")
+                r = self.fetch(url, headers=self.headers, timeout=10)
+
+                if r.status_code == 200:
+                    return r
+
+            except Exception as e:
+                last = e
+
+        raise last
+
+    # ================= 首页 =================
+
+    def homeContent(self, filter):
+
+        data = self.fetch_host("api.php/app/nav?token=").json()
+
+        return {
+            "class": [
+                {
+                    "type_name": x["type_name"],
+                    "type_id": x["type_id"]
+                }
+                for x in data.get("list", [])
+            ],
+            "filters": {}
+        }
+
+    # ================= 推荐 =================
+
+    def homeVideoContent(self):
+
+        data = self.fetch_host(
+            "api.php/app/index_video?token="
+        ).json()
+
+        res = []
+        for i in data.get("list", []):
+            res.extend(i.get("vlist", []))
+
+        return {"list": res}
+
+    # ================= 分类 =================
+
+    def categoryContent(self, tid, pg, filter, extend):
+
+        url = (
+            f"api.php/app/video?tid={tid}&pg={pg}&limit=18"
+        )
+
+        return self.fetch_host(url).json()
+
+    # ================= 搜索 =================
+
+    def searchContent(self, key, quick, pg="1"):
+
+        data = self.fetch_host(
+            f"api.php/app/search?text={key}&pg={pg}"
+        ).json()
+
+        for i in data.get("list", []):
+            i.pop("type", None)
+
+        return {
+            "list": data.get("list", []),
+            "page": pg
+        }
+
+    # ================= 详情 =================
+
+    def detailContent(self, ids):
+
+        data = self.fetch_host(
+            f"api.php/app/video_detail?id={ids[0]}"
+        ).json()["data"]
+
+        play_from = []
+        play_urls = []
+
+        idx = 0
+
+        for p in data.get("vod_url_with_player", []):
+
+            urls = []
+
+            for u in p.get("url", "").split("#"):
+
+                if "$" not in u:
+                    continue
+
+                name, url = u.split("$", 1)
+
+                real = self.decode(url)
+
+                if not real:
+                    continue
+
+                urls.append(f"{name}${real}")
+
+            if not urls:
+                continue
+
+            play_from.append(
+                self.PLAY_NAME_POOL[idx % len(self.PLAY_NAME_POOL)]
+            )
+
+            play_urls.append("#".join(urls))
+
+            idx += 1
+
+        data.pop("vod_url_with_player", None)
+
+        data["vod_play_from"] = "$$$".join(play_from)
+        data["vod_play_url"] = "$$$".join(play_urls)
+
+        return {"list": [data]}
+
+    # ================= 播放（核心稳定） =================
+
+    def playerContent(self, flag, video_id, vipFlags):
+
+        host = self.get_host(video_id)
+
+        return {
+            "parse": 0,
+            "jx": 0,
+            "playUrl": "",
+            "url": video_id,
+            "header": {
+                "User-Agent": "okhttp/4.12.0",
+                "Referer": f"http://{host}/",
+                "Origin": f"http://{host}"
+            }
+        }
+
+    # ================= 自动识别域名 =================
+
+    def get_host(self, url):
+
+        m = re.search(r"https?://([^/]+)", url)
+        return m.group(1) if m else "wx4kjx.lyyytv.cn"
+
+    # ================= 解密 =================
+
+    def decode(self, text):
+
+        if not text:
+            return ""
+
+        if not text.startswith("lvdou+"):
+
+            return text.replace("\\u0026", "&").strip()
+
+        try:
+
+            key = self.cmskey[:16].encode()
+            iv = self.cmskey[-16:].encode()
+
+            cipher = AES.new(key, AES.MODE_CBC, iv)
+
+            ct = base64.b64decode(text[6:])
+            pt = cipher.decrypt(ct)
+
+            return unpad(pt, 16).decode()
+
+        except:
+            return text
+
+    # ================= 工具 =================
+
+    def getName(self):
+        return "LYYY稳定版"
+
+    def isVideoFormat(self, url):
+        return bool(re.search(r"\.(mp4|m3u8|flv)$", url))
